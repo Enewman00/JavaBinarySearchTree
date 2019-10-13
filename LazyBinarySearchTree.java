@@ -23,7 +23,7 @@
         
         
         //Constructor to create new TreeNodes
-        TreeNode(TreeNode k)
+        TreeNode(int k)
         {
             key = k;
             leftChild = null;
@@ -45,7 +45,6 @@
 
     //--------------functions-------------------------------------------------
     
-    //NOT DONE
     //insert item into BST
     //if duplicate, do nothing
     public boolean insert(int key) throws IllegalArgumentException
@@ -53,13 +52,98 @@
         //if key is invalid, throw error with message
         if (key < 1 || key > 99)
         {
-            throw new IllegalArgumentException("Key is not in range 1-99");
+            throw new IllegalArgumentException();
         }
-        return true;
+
+        TreeNode curr = root;
+        boolean found = false;
+        
+        //if root is null, insert at root
+        if (root == null)
+        {
+            root = new TreeNode(key);
+            found = true;
+            return true;
+        }
+
+        //handle if root is the key
+        else if (root.key == key && root.deleted)
+        {
+            root.deleted = false;
+            return true;
+
+        }
+        else if (root.key == key)
+        {
+            return false;
+        }
+
+
+
+        while (!found)
+        {
+            // key to the left
+            if (key < curr.key)
+            {
+                //if not left child, insert on left
+                if (curr.leftChild == null)
+                {
+                    curr.leftChild = new TreeNode(key);
+                    found = true;
+                    return true;
+                }
+                //if left is = to key
+                else if (curr.leftChild.key == key && curr.leftChild.deleted == true)
+                {
+                    curr.leftChild.deleted = false;
+                    found = true;
+                    return true;
+                }
+                //not deleted
+                else if (curr.leftChild.key == key && curr.leftChild.deleted == false)
+                {
+                    return false;
+                }
+
+                //go to subtree
+                else
+                {
+                    curr = curr.leftChild;
+                }
+            }
+            //key to the right
+            else 
+            {
+                // if not left child, insert on left
+                if (curr.rightChild == null)
+                {
+                    curr.rightChild = new TreeNode(key);
+                    found = true;
+                    return true;
+                }
+                // if left is = to key
+                else if (curr.rightChild.key == key && curr.rightChild.deleted == true) {
+                    curr.rightChild.deleted = false;
+                    found = true;
+                    return true;
+                }
+                // not deleted
+                else if (curr.leftChild.key == key && curr.rightChild.deleted == false) {
+                    return false;
+                }
+
+                // go to subtree
+                else {
+                    curr = curr.rightChild;
+                }
+            }
+        }
+        
+
+        return false;
     }
 
 
-    //NOT DONE
     //mark deleted item
     public boolean delete(int key) throws IllegalArgumentException
     {
@@ -89,6 +173,11 @@
         TreeNode nonDelete = null;
         TreeNode curr = root;
 
+        if (!curr.deleted)
+        {
+            nonDelete = curr;
+        }
+
         //loop through left Nodes
         while (curr.leftChild != null)
         {
@@ -103,7 +192,7 @@
         //if nonDelete isnt empty, return it 
         if (nonDelete != null)
         {
-            return nonDelete;
+            return nonDelete.key;
         }
 
         return -1;
@@ -117,6 +206,9 @@
         TreeNode nonDelete = null;
         TreeNode curr = root;
 
+        if (!curr.deleted) {
+            nonDelete = curr;
+        }   
         // loop through left Nodes
         while (curr.rightChild != null) {
             // if not deleted
@@ -128,8 +220,9 @@
 
         // if nonDelete isnt empty, return it
         if (nonDelete != null) {
-            return nonDelete;
+            return nonDelete.key;
         }
+        return -1;
 
     }
 
@@ -155,35 +248,35 @@
 
 
     //preoder traversal helper
-    private static preorderPrint(TreeNode curr)
+    private String preorderPrint(TreeNode curr)
     {
         if (curr == null)
         {
-            return;
+            return "";
         }
 
         //if deleted is true, print with asterisk
         if (curr.deleted)
         {
-            System.out.print("*" + node.key + " ");
+            return ("*" + curr.key + " " + preorderPrint(curr.leftChild) + preorderPrint(curr.rightChild));
         }
         else
         {
-            System.out.print(curr.key + " ");
+            return (curr.key + " " + preorderPrint(curr.leftChild) + preorderPrint(curr.rightChild));
         }
 
         //traverse left
-        preorderPrint(curr.leftChild);
+        // preorderPrint(curr.leftChild);
         //traverse right
-        preorderPrint(curr.rightChild);
+        // preorderPrint(curr.rightChild);
     }
 
     //print preorder value of each element. Deleted elements preceded by *
     // 45 30 2 *5 47 50 *60
     public String toString()
     {
-        preorder(root);
-        return "";
+        // preorderPrint(root);
+        return preorderPrint(root);
     }
 
     //height helper (recursive)
@@ -192,7 +285,7 @@
     {
         if (curr == null)
         {
-            return 0;
+            return -1;
         }
 
         else

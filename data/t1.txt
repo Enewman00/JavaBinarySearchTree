@@ -14,7 +14,6 @@ Size
 Insert:84
 Insert:32
 Insert:132
-Page 3 of 5
 PrintTree
 Insert:980
 Insert

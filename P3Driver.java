@@ -21,6 +21,7 @@ public class P3Driver {
     public static void main(String[] args) {
         
         Scanner in;
+        Scanner lineScanner;
         if (args.length!=2) {
             System.out.print("Error Incorrect Arguments:" + Arrays.toString(args));
             System.exit(0);
@@ -37,29 +38,32 @@ public class P3Driver {
             PrintWriter out;
             out = new PrintWriter(output_file);
 
-            //create new IDedLinkedList
-            IDedLinkedList<MyItem> LL = new IDedLinkedList(); 
+            //create new bst
+            LazyBinarySearchTree BST = new LazyBinarySearchTree(); 
 
             //variables to save operation and line number
             String operation = "";
 	        int lineno = 0;
 	
             
-	        int id, price;
+	        int key = 0;
             boolean result;
-	        List<Integer> name = new LinkedList<>();
             
             whileloop:
-            while (in.hasNext())
+            while (in.hasNextLine())
             {
 	            lineno++;
-	   
-                operation = in.next();
+                
+                String line = in.nextLine();
+
+                
+                lineScanner = new Scanner(line).useDelimiter(":");
+                operation = lineScanner.next();
 
                 //if it starts with a #, skip it
                 if(operation.charAt(0) == '#')
                 {
-		            in.nextLine();
+		            // in.nextLine();
 		            continue;
                 }
                 switch (operation)
@@ -68,62 +72,52 @@ public class P3Driver {
                     case "End":
                         break whileloop;
                     
-                    //if "Insert",  create new item (MyItem) with id, price, name. Insert it at front of LL
+                    //if "Insert", Insert node with Key at appropriate spot in BST
                     case "Insert":
                         try
                         {
-                                
-                            id = in.nextInt();
-                            price = in.nextInt();
-                            name.clear();
-                            while(true)
-                            {
-                                int val = in.nextInt();
-                                if(val == 0)
-                                {
-                                    break;
-                                }
-                                else
-                                {
-                                    name.add(val);
-                                }
-                            }
-                            MyItem new_item = new MyItem(id, price, name);
-                            result = LL.insertAtFront(new_item);
-                            //result = Insert the item into the linkedlist and print true or false 
+                            key = lineScanner.nextInt();
+
+                            result = BST.insert(key);
+                            //result = Insert the item into the bst and print true or false 
                             out.println(result ? "True" :"False");
+                        }
+                        catch (IllegalArgumentException ex)
+                        {
+                            out.println("Error in insert " + ex);
                         }
                         catch (Exception e)
                         {
-                            out.println("ERROR");
+                            out.println("Error in line: " + line);
                         }
                         break;
                     
-                    //if "FindID", create MyItem copy of LL.findID(id), print the ID (MyItem method)
-                    case "FindID":
+                    //if "dELETE", Delete node with Key at appropriate spot in BST
+                    case "Delete":
                         try
                         {
-                            id = in.nextInt();
-                            MyItem item1 = LL.findID(id);
-                            //Call the FindID method and printID method to print to the output file the entire item in a line. If the item is not found or the list is empty print Null
-                            out.println(item1 != null ? item1.printID(): "Null");
+                            key = lineScanner.nextInt();
+
+                            result = BST.delete(key);
+                            // result = Delete the item from the bst and print true or false
+                            out.println(result ? "True" : "False");
                         }
-                        catch (Exception e){
-                            out.println("ERROR");
+                        catch (IllegalArgumentException ex)
+                        {
+                            out.println("Error in delete " + ex);
+                        } 
+                        catch (Exception e)
+                        {
+                            out.println("Error in line: " + line);
                         }
                         break;
 
-                    //if "DeleteID", create MyItem copy of LL.delete(id), print its ID
-                    case "DeleteID":
+                    //if "PrintTree", print tree in preorder traversal
+                    case "PrintTree":
                         try
                         {
-                            id = in.nextInt();
-                        
-                    
-                            //Call the DeleteID method and printID method to print to the output file the entire item in a line. If the item is not found or the list is empty print Null
-                            MyItem  item1 = LL.delete(id);
-                            //Call the FindID method and printID method to print to the output file the entire item in a line. If the item is not found or the list is empty print Null
-                            out.println(item1 != null ? item1.printID(): "Null");
+                            //call the toString method on the BST
+                            out.println(BST.toString());
                         }
                         catch (Exception e){
                             out.println("ERROR");
@@ -131,30 +125,63 @@ public class P3Driver {
                         
                         break;
                     
-                    //if "Delete", create MyItem copy of LL.deleteFromFront(id), LL.deleteFromFront(), print itemID
-                    case "Delete":
-                        //If the list is not empty print and delete the first item in the list. if the list is empty print Null
-                
-                        MyItem  item1 = LL.deleteFromFront();
-                        //Call the FindID method and printID method to print to the output file the entire item in a line. If the item is not found or the list is empty print Null
-                        out.println(item1 != null ? item1.printID(): "Null");
+                    //if "Contains", print true if tree contains key, false if not
+                    case "Contains":
+                        try {
+
+                            key = lineScanner.nextInt();
+
+                            result = BST.contains(key);
+                            // result = contains the item in the bst and print true or false
+                            out.println(result ? "True" : "False");
+                        }
+                        catch (IllegalArgumentException ex)
+                        {
+                            out.println("Error in insert " + ex);
+                        }
+                        catch (Exception e) {
+                            out.println("Error in line: " + line);
+                        }
                         break;
                     
-                            
             
-            
-                    //return the sum of ids of all elements currently in the list. If the list is empty, return -1
-                    case "PrintTotal":
-                        //Call the printtotal method of the linkedlist and print the given int into the output file.
-                        int total = LL.printTotal();
-                        out.println(total);
+                    //if "findMin", call findMin method of BST to return lowest key
+                    case "FindMin":
+                        //Call the findMin method of the bst and print the given int into the output file.
+                        int min = BST.findMin();
+                        out.println(min);
+                        break;
+
+
+                    //if "findMin", call findMax method of BST to return lowest key
+                    case "FindMax":
+                        //Call the findMax method of the bst and print the given int into the output file.
+                        int max = BST.findMax();
+                        out.println(max);
                         break;
                         
+
+                    // if "height", call the height method of the BST and return it (longest chain of nodes)
+                    case "Height":
+                        int height = BST.height();
+                        out.println(height + "");
+                        break;
+
+
+                    //if "size", call the size method of the BST and return it (number of nodes in tree)
+                    case "Size":
+                        int size = BST.size();
+                        out.println(size + "");
+                        break;
+                        
+
+
                     //else, ERROR
                     default:
-                        out.println("ERROR");
-                        in.nextLine();
-	            }
+                        out.println("Error in line: " + operation);
+                        //in.nextLine();
+                }
+                lineScanner.close();
             }
             //close files
             in.close();
